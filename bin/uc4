@@ -1,0 +1,12 @@
+#!/bin/bash
+
+BASEDIR=$(dirname $0)/..
+
+source $BASEDIR/lib/my-docker.sh
+
+docker run \
+  --rm \
+  --name uc4 \
+  -e DISPLAY=$DISPLAY \
+  -v $MY_DOCKER/uc4:/home/$USER \
+  $USER/uc4

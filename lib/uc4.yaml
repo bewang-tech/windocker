@@ -1,0 +1,9 @@
+version: '3.0'
+services:
+  uc4:
+    container_name: uc4
+    image: $USER/uc4
+    environment:
+      - DISPLAY=$DISPLAY
+    volumes:
+      - $MY_DOCKER/uc4:/home/$USER

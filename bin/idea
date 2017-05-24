@@ -1,0 +1,19 @@
+#!/bin/bash
+
+BASEDIR=$(dirname $0)/..
+
+source $BASEDIR/lib/my-docker.sh
+
+docker run \
+  --rm \
+  --name intellij \
+  -e DISPLAY=$DISPLAY \
+  -v $MY_DOCKER/intellij:/home/$USER \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  --dns-search sea2.rhapsody.com \
+  --dns-search sea1.rhapsody.com \
+  --dns-search corp.rhapsody.com \
+  --dns-search internal.rhapsody.com \
+  --dns-search rhapsody.com \
+  $USER/intellij \
+  /usr/local/bin/idea

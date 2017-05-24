@@ -1,0 +1,13 @@
+version: '3.0'
+services:
+  intellij:
+    container_name: intellij
+    image: $USER/intellij
+    environment:
+      - DISPLAY=$DISPLAY
+    dns-search:
+      - corp.rhapsody.com
+      - sea2.rhapsody.com
+      - interal.rhapsody.com
+    volumes:
+      - $MY_DOCKER/intellij:/home/$USER
