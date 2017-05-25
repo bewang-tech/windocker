@@ -3,6 +3,8 @@
      |
      |-- dev-env
      |   |-- windocker (Windows docker environment scripts)
+     |   |   |- bin
+     |   |   \- lib
      |   |-- cygwin64 (Cygwin Installation)
      |   \-- downloads (downloaded setup executables)
      |       |
@@ -19,6 +21,8 @@ $DownloadDir = "$DevEnvDir\downloads"
 $CygwinDir = "$DevEnvDir\cygwin64"
 $CygwinPkgsDir = "$DownloadDir\cygwin"
 
+$WindockerURL="http://10.151.77.17/windocker.zip"
+
 $Shell = New-Object -ComObject("WScript.Shell")
 
 Add-Type -AssemblyName System.IO.Compression.FileSystem
@@ -32,11 +36,11 @@ function Download($uri, $outfile) {
   $Webclient.DownloadFile($uri, $outfile)
 }
 
-function Install-DevScripts {
+function Install-Windocker {
   $zip = "$DownloadDir\windocker.zip"
 
   Download `
-    -uri "" `
+    -uri $WindockerURL `
     -outfile $zip
 
   Unzip $zip $WindockerDir
@@ -80,6 +84,14 @@ function Install-DockerToolbox {
   Start-Process "$toolbox" -ArgumentList "/SILENT" -Wait
 }
 
+function Create-Docker-Link($name, $app, $ico) {
+  $Shortcut = $Shell.CreateShortCut("$env:UserProfile\Desktop\$name.lnk")
+  $Shortcut.TargetPath = "C:\Program Files\Git\bin\bash.exe"
+  $Shortcut.Arguments="-login -i ""$WindockerDir\bin\start.sh"" $app"
+  $Shortcut.iconLocation = $ico
+  $Shortcut.save()
+}
+
 function Cygwin-X-Link {
   $Shortcut = $Shell.CreateShortCut("$env:UserProfile\Desktop\CygwinX.lnk")
   $Shortcut.TargetPath = "$CygwinDir\bin\sh.exe"
@@ -89,33 +101,49 @@ function Cygwin-X-Link {
 }
 
 function UC4-Link {
-  $Shortcut = $Shell.CreateShortCut("$env:UserProfile\Desktop\UC4.lnk")
-  $Shortcut.TargetPath = "C:\Program Files\Git\bin\bash.exe"
-  $Shortcut.Arguments="-login -i ""$WindockerDir\uc4"""
-  $Shortcut.iconLocation = "$WinDockerDir\uc4.ico"
-  $Shortcut.save()
+  Create-Docker-Link `
+    -name UC4 `
+    -app "$WindockerDir\bin\uc4" `
+    -ico "$WindockerDir\lib\uc4.ico"
 }
 
-function Intellij-Link {
-  $Shortcut = $Shell.CreateShortCut("$env:UserProfile\Desktop\Intellij.lnk")
-  $Shortcut.TargetPath = "C:\Program Files\Git\bin\bash.exe"
-  $Shortcut.Arguments="-login -i ""$WindockerDir\intellij"""
-  $Shortcut.iconLocation = "$WinDockerDir\idea.ico"
-  $sHortcut.save()
+function Idea-Link {
+  Create-Docker-Link `
+    -name Intellij `
+    -app "$WindockerDir\bin\idea" `
+    -ico "$WindockerDir\lib\idea.ico"
+}
+
+function DevShell-Link {
+  Create-Docker-Link `
+    -name "Dev Shell" `
+    -app "$WindockerDir\bin\devsh" `
+    -ico "$WindockerDir\lib\idea.ico"
 }
 
 function Create-DockerMachine {
-  
+  Start-Process "C:\Program Files\Git\bin\bash.exe" `
+    -ArgumentList "--login $WindockerDir\bin\windocker.sh" `
+    -Wait
+}
+
+function Setup-Developer-Env {
+  Start-Process "C:\Program Files\Git\bin\bash.exe" `
+    -ArgumentList "--login $WindockerDir\bin\start.sh $WindockerDir\lib\dev_env.sh" `
+    -Wait
 }
 
 function DoAll {
   Create-Env
   Install-CygwinX
   Install-DockerToolbox
-  Create-DockerMachine
+  Install-Windocker
+  # Create-DockerMachine
+  # Setup-Developer-Env
   Cygwin-X-Link
   UC4-Link
   Intellij-Link
+  DevShell-Link
 }
 
 $cmd=$args[0]

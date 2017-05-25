@@ -1,4 +1,4 @@
-@echo off
+REM @echo off
 set BASEDIR=%~dp0
 
 if "%CYGWIN_HOME%" == "" set CYGWIN_HOME=%USERPROFILE%\dev-env\cygwin64
