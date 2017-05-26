@@ -4,7 +4,9 @@ BASEDIR=$(dirname $0)/..
 
 export PATH="/c/Program Files/Docker Toolbox:$PATH"
 VM=${DOCKER_MACHINE_NAME-default}
-DOCKER_MACHINE=docker-machine.exe
+DOCKER_MACHINE=./docker-machine.exe
+
+cd "/c/Program Files/Docker Toolbox"
 
 RHAP_DOCKER=${RHAP_DOCKER:-10.151.77.17}
 RHAP_REG=${RHAP_REG:-rhapdocker:5000}
@@ -12,8 +14,10 @@ RHAP_REG=${RHAP_REG:-rhapdocker:5000}
 vboxmanage() {
   if [ ! -z "$VBOX_MSI_INSTALL_PATH" ]; then
     echo "${VBOX_MSI_INSTALL_PATH}VBoxManage.exe"
-  else
+  elif [ ! -z "$VBOX_INSTALL_PATH" ]; then
     echo "${VBOX_INSTALL_PATH}VBoxManage.exe"
+  else
+    echo "/c/Program Files/Oracle/Virtualbox/VBoxManage.exe"
   fi
 }
 
@@ -48,9 +52,13 @@ config_rhapdocker_cert() {
   echo "Copying rhapdocker.crt to ${VM} ..."
   "${DOCKER_MACHINE}" scp $BASEDIR/lib/rhapdocker.crt ${VM}:/tmp
 
-  CERT_DIR=/etc/docker/$RHAP_REG
+  CERT_DIR=/etc/docker/certs.d/$RHAP_REG
   echo "Putting rhapdocker.crt to $CERT_DIR ..."
   "${DOCKER_MACHINE}" ssh ${VM} "if [ -e $CERT_DIR ]; then sudo rm -rf $CERT_DIR; fi; sudo mkdir -p $CERT_DIR; sudo mv /tmp/rhapdocker.crt $CERT_DIR"
+}
+
+restart_docker_machine() {
+  "${DOCKER_MACHINE}" restart
 }
 
 setup_docker_machine() {
@@ -59,6 +67,9 @@ setup_docker_machine() {
 
   echo "Configuring rhapdocker certificate ..."
   config_rhapdocker_cert
+
+  echo "Restarting docker machine $VM ..."
+  restart_docker_machine
 }
 
 "$@"

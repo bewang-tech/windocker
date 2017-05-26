@@ -3,7 +3,7 @@
 X0_LOCK=/tmp/.X0-lock
 
 start_xwin() {
-  XWin :0 -multiwindow -clipboard -listen tcp &
+  XWin :0 -multiwindow -clipboard -listen tcp -from 192.168.99.1 &
 }
 
 if [ -f $X0_LOCK ]; then

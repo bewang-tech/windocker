@@ -1,3 +1,9 @@
+#!/bin/bash
+
+BASEDIR=$(dirname $0)/..
+
+source $BASEDIR/lib/my-docker.sh
+
 pull_bi_uc4() {
   docker pull $RHAP_REG/bi/uc4
 }
@@ -23,7 +29,7 @@ build_user_image() {
 FROM $image
 
 RUN useradd $USER \
-    echo "$USER ALL=(ALL) NOPASSWORD: ALL" >> /etc/sudoers
+    && echo "$USER ALL=(ALL) NOPASSWORD: ALL" >> /etc/sudoers
 
 USER $USER
 EOF
@@ -34,11 +40,11 @@ EOF
 }
 
 build_user_uc4() {
-  build_user_image $RHAP_REG/bi/uc4 bwang/uc4
+  build_user_image $RHAP_REG/bi/uc4 $USER/uc4
 }
 
 build_user_intellij() {
-  build_user_image $RHAP_REG/bi/intelij bwang/intellij
+  build_user_image $RHAP_REG/bi/intelij $USER/intellij
 }
 
 init_user_intellij() {
@@ -50,10 +56,10 @@ init_user_intellij() {
 
 setup_developer_env() {
   echo "Pulling bi/uc4 ..."
-  pull_uc4_image
+  pull_bi_uc4
 
   echo "Pulling bi/intellij ..."
-  pull_intellij_image
+  pull_bi_intellij
 
   echo "Building $USER/uc4 ..."
   build_user_uc4

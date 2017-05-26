@@ -8,7 +8,9 @@ trap '[ "$?" -eq 0 ] || read -p "Looks like something went wrong in step ´$STEP
 export PATH="/c/Program Files/Docker Toolbox:$PATH"
 VM=${DOCKER_MACHINE_NAME-default}
 RHAPDOCKER=${RHAPDOCKER:-10.151.77.17}
-DOCKER_MACHINE=$(which docker-machine.exe)
+DOCKER_MACHINE=./docker-machine.exe
+
+cd "/c/Program Files/Docker Toolbox"
 
 STEP="Looking for vboxmanage.exe"
 if [ ! -z "$VBOX_MSI_INSTALL_PATH" ]; then
@@ -72,7 +74,7 @@ STEP="Setting env"
 eval "$("${DOCKER_MACHINE}" env --shell=bash --no-proxy ${VM})"
 
 STEP="Adding rhapdocker into /etc/host"
-"$DOCKER_MACHINE" ssh "${VM}" "sudo sed -i /rhapdocker/d; sudo /bin/sh -c 'echo $RHAPDOCKER rhapdocker >> /etc/hosts'"
+"$DOCKER_MACHINE" ssh "${VM}" "sudo sed -i '/rhapdocker/d'; sudo /bin/sh -c 'echo $RHAPDOCKER rhapdocker >> /etc/hosts'"
 
 STEP="Finalize"
 clear

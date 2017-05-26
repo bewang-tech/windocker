@@ -69,7 +69,7 @@ function Install-CygwinX {
       -outfile "$setup"
   }
 
-  Start-Process "$setup" -ArgumentList "--site ""http://mirrors.xmission.com/cygwin"" --root ""$CygwinDir"" --packages xorg-server --no-admin --local-package-dir ""$CygwinPkgsDir"" --upgrade-also --quiet-mode" -Wait
+  Start-Process "$setup" -ArgumentList "--site ""http://mirrors.xmission.com/cygwin"" --root ""$CygwinDir"" --packages xorg-server --no-admin --local-package-dir ""$CygwinPkgsDir"" --upgrade-also --quiet-mode" -Wait -NoNewWindow
 }
 
 function Install-DockerToolbox {
@@ -81,7 +81,7 @@ function Install-DockerToolbox {
       -outfile "$toolbox"
   }
 
-  Start-Process "$toolbox" -ArgumentList "/SILENT" -Wait
+  Start-Process "$toolbox" -ArgumentList "/SILENT" -Wait -NoNewWindow
 }
 
 function Create-Docker-Link($name, $app, $ico) {
@@ -123,26 +123,26 @@ function DevShell-Link {
 
 function Create-DockerMachine {
   Start-Process "C:\Program Files\Git\bin\bash.exe" `
-    -ArgumentList "--login $WindockerDir\bin\windocker.sh" `
-    -Wait
+    -ArgumentList "--login $WindockerDir\lib\windocker.sh setup_docker_machine" `
+    -Wait -NoNewWindow
 }
 
 function Setup-Developer-Env {
   Start-Process "C:\Program Files\Git\bin\bash.exe" `
-    -ArgumentList "--login $WindockerDir\bin\start.sh $WindockerDir\lib\dev_env.sh" `
-    -Wait
+    -ArgumentList "--login $WindockerDir\bin\start.sh $WindockerDir\lib\dev_env.sh setup_developer_env" `
+    -Wait -NoNewWindow
 }
 
-function DoAll {
+function Install {
   Create-Env
   Install-CygwinX
   Install-DockerToolbox
   Install-Windocker
-  # Create-DockerMachine
-  # Setup-Developer-Env
+  Create-DockerMachine
+  Setup-Developer-Env
   Cygwin-X-Link
   UC4-Link
-  Intellij-Link
+  Idea-Link
   DevShell-Link
 }
 

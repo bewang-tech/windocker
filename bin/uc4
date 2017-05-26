@@ -4,6 +4,8 @@ BASEDIR=$(dirname $0)/..
 
 source $BASEDIR/lib/my-docker.sh
 
+$BASEDIR/bin/cygwin-x.bat
+
 docker run \
   --rm \
   --name uc4 \
