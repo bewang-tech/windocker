@@ -4,9 +4,7 @@ BASEDIR=$(dirname $0)/..
 
 export PATH="/c/Program Files/Docker Toolbox:$PATH"
 VM=${DOCKER_MACHINE_NAME-default}
-DOCKER_MACHINE=./docker-machine.exe
-
-cd "/c/Program Files/Docker Toolbox"
+DOCKER_MACHINE=docker-machine.exe
 
 RHAP_DOCKER=${RHAP_DOCKER:-10.151.77.17}
 RHAP_REG=${RHAP_REG:-rhapdocker:5000}
@@ -49,16 +47,17 @@ add_rhapdocker_host() {
 }
 
 config_rhapdocker_cert() {
+  echo "Adding docker machine environment ..."
+  eval "$($DOCKER_MACHINE env ${VM})"
+
   echo "Copying rhapdocker.crt to ${VM} ..."
-  "${DOCKER_MACHINE}" scp $BASEDIR/lib/rhapdocker.crt ${VM}:/tmp
+  pushd $BASEDIR
+  "${DOCKER_MACHINE}" scp lib/rhapdocker.crt ${VM}:/tmp
+  popd
 
   CERT_DIR=/etc/docker/certs.d/$RHAP_REG
   echo "Putting rhapdocker.crt to $CERT_DIR ..."
   "${DOCKER_MACHINE}" ssh ${VM} "if [ -e $CERT_DIR ]; then sudo rm -rf $CERT_DIR; fi; sudo mkdir -p $CERT_DIR; sudo mv /tmp/rhapdocker.crt $CERT_DIR"
-}
-
-restart_docker_machine() {
-  "${DOCKER_MACHINE}" restart
 }
 
 setup_docker_machine() {
@@ -67,9 +66,6 @@ setup_docker_machine() {
 
   echo "Configuring rhapdocker certificate ..."
   config_rhapdocker_cert
-
-  echo "Restarting docker machine $VM ..."
-  restart_docker_machine
 }
 
 "$@"
