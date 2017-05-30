@@ -1,15 +1,15 @@
 #!/bin/bash
 
-BASEDIR=$(dirname $0)/..
+BASEDIR=$(dirname $(realpath $0))/..
 
 source $BASEDIR/lib/my-docker.sh
 
 pull_bi_uc4() {
-  docker pull $RHAP_REG/bi/uc4
+  docker pull $RHAPREG/bi/uc4
 }
 
 pull_bi_intellij() {
-  docker pull $RHAP_REG/bi/intellij
+  docker pull $RHAPREG/bi/intellij
 }
 
 build_user_image() {
@@ -40,18 +40,20 @@ EOF
 }
 
 build_user_uc4() {
-  build_user_image $RHAP_REG/bi/uc4 $USER/uc4
+  mkdir -p $MY_DOCKER/uc4
+  build_user_image $RHAPREG/bi/uc4 $USER/uc4
 }
 
 build_user_intellij() {
-  build_user_image $RHAP_REG/bi/intelij $USER/intellij
+  mkdir -p $MY_DOCKER/intellij
+  build_user_image $RHAPREG/bi/intellij $USER/intellij
 }
 
 init_user_intellij() {
   docker run --rm \
     -v $MY_DOCKER/intellij:/home/$USER \
     $USER/intellij \
-    /bin/bash -l -x /opt/profile/setup.sh
+    /bin/bash -l /opt/profile/setup.sh
 } 
 
 setup_developer_env() {
