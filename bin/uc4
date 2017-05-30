@@ -1,10 +1,10 @@
 #!/bin/bash
 
-BASEDIR=$(dirname $0)/..
+BASEDIR=$(dirname $(realpath $0))/..
 
 source $BASEDIR/lib/my-docker.sh
 
-$BASEDIR/bin/cygwin-x.bat
+start_cygwin_x
 
 docker run \
   --rm \
