@@ -1,0 +1,50 @@
+plugins {
+  id "distribution"
+  id "org.ajoberstar.grgit" version "1.6.0"
+}
+
+ext {
+  git = org.ajoberstar.grgit.Grgit.open(currentDir: project.projectDir)
+  revision = git.head().id
+  tagged = git.describe()
+  gitVersion = tagged == null ?  "" : tagged.replaceFirst(/^(?i)v/, "")
+
+  dockerBuild = file("${project.buildDir}/docker")
+}
+
+group = "com.napster.bi"
+version = gitVersion
+description = "Scripts for setting up BI developer environment"
+
+task wrapper(type: Wrapper) { gradleVersion = "3.3" }
+
+distributions {
+  main {
+    contents {
+      into('bin') { from 'bin' }
+      into('lib') { from 'lib' }
+    }
+  }
+}
+
+println("git-version: $gitVersion")
+
+task copyHomepage(type: Copy) {
+  from "web/index.html"
+  filter { line -> 
+    line.replaceAll(~/\$\{windocker.version\}/, gitVersion)
+  }
+  into dockerBuild
+}
+
+task copyFiles(type: Copy, dependsOn: distZip) {
+  from "Dockerfile"
+  from "bin/windocker.ps1"
+  from distZip.archivePath
+  into dockerBuild
+}
+
+task buildImage(type: Exec, dependsOn: [ 'copyHomepage', 'copyFiles' ]) {
+  workingDir = dockerBuild
+  commandLine "sudo", "docker", "build", "-t", "rhapdocker:5000/bi/windocker", "."
+}
