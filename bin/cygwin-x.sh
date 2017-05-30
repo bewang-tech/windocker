@@ -1,9 +1,13 @@
 #!/bin/bash
 
 X0_LOCK=/tmp/.X0-lock
+DOCKER_MACHINE_IP=$1
 
 start_xwin() {
-  XWin :0 -multiwindow -clipboard -listen tcp -from 192.168.99.1 &
+  XWin :0 -multiwindow -clipboard -listen tcp &
+  if [ -n "$DOCKER_MACHINE_IP" ]; then
+    xhost +"$DOCKER_MACHINE_IP"
+  fi
 }
 
 if [ -f $X0_LOCK ]; then
