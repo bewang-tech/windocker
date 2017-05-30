@@ -7,15 +7,13 @@
      |   |   \- lib
      |   |-- cygwin64 (Cygwin Installation)
      |   \-- downloads (downloaded setup executables)
-     |       |
-     |       |-- cygwin (cygwin downloaded packages)
+     |       \-- cygwin (cygwin downloaded packages)
      |
      \-- my-docker
 	 |-- uc4 (Home directory for UC4)
 	 \-- intellij (Home directory for user's intellij)
 #>
 $DevEnvDir = "$env:UserProfile\dev-env"
-$MyDockerDir = "$env:UserProfile\my-docker"
 $WindockerDir= "$DevEnvDir\windocker"
 $DownloadDir = "$DevEnvDir\downloads"
 $CygwinDir = "$DevEnvDir\cygwin64"
@@ -50,16 +48,10 @@ function Create-Dir($path) {
   New-Item -ItemType Directory -Force -Path "$path"
 }
 
-
 function Create-Env {
   Create-Dir "$DevEnvDir"
   Create-Dir "$DownloadDir"
-  Create-Dir "$MyDockerDir"
-
-  Create-Dir "$MyDockerDir\uc4"
-  Create-Dir "$MyDockerDir\intellij"
 }
-
 
 function Install-CygwinX {
   $setup = "$DownloadDir\setup-x86_64.exe"
@@ -95,7 +87,7 @@ function Create-Docker-Link($name, $app, $ico) {
 function Cygwin-X-Link {
   $Shortcut = $Shell.CreateShortCut("$env:UserProfile\Desktop\CygwinX.lnk")
   $Shortcut.TargetPath = "$CygwinDir\bin\sh.exe"
-  $Shortcut.Arguments="-c ""XWin :0 -listen tcp -multiwindow -clipboard"""
+  $Shortcut.Arguments = "$WindockerDir\bin\cygwin-x.sh"
   $Shortcut.iconLocation = "$CygwinDir\Cygwin.ico"
   $Shortcut.save()
 }
@@ -123,13 +115,13 @@ function DevShell-Link {
 
 function Create-DockerMachine {
   Start-Process "C:\Program Files\Git\bin\bash.exe" `
-    -ArgumentList "--login $WindockerDir\lib\windocker.sh setup_docker_machine" `
+    -ArgumentList "--login ""$WindockerDir\lib\windocker"" setup_docker_machine" `
     -Wait -NoNewWindow
 }
 
 function Setup-Developer-Env {
   Start-Process "C:\Program Files\Git\bin\bash.exe" `
-    -ArgumentList "--login $WindockerDir\bin\start.sh $WindockerDir\lib\dev_env.sh setup_developer_env" `
+    -ArgumentList "--login ""/c/Program Files/Docker Toolbox/start.sh"" ""$WindockerDir\lib\devenv"" setup_developer_env" `
     -Wait -NoNewWindow
 }
 
