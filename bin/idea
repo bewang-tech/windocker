@@ -1,14 +1,17 @@
 #!/bin/bash
 
-BASEDIR=$(dirname $0)/..
+BASEDIR=$(dirname $(realpath $0))/..
 
 source $BASEDIR/lib/my-docker.sh
+
+start_cygwin_x
 
 docker run \
   --rm \
   --name intellij \
   -e DISPLAY=$DISPLAY \
-  -v $MY_DOCKER/intellij:/home/$USER \
+  -v /mnt/sda1/$USER/intellij:/home/$USER \
+  -v $MY_DOCKER/intellij/workplace:/home/$USER/workplace \
   -v /var/run/docker.sock:/var/run/docker.sock \
   --dns-search sea2.rhapsody.com \
   --dns-search sea1.rhapsody.com \
@@ -16,4 +19,4 @@ docker run \
   --dns-search internal.rhapsody.com \
   --dns-search rhapsody.com \
   $USER/intellij \
-  /usr/local/bin/idea
+  /bin/bash --login /usr/local/bin/idea
