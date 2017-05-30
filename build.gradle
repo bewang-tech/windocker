@@ -18,16 +18,22 @@ description = "Scripts for setting up BI developer environment"
 
 task wrapper(type: Wrapper) { gradleVersion = "3.3" }
 
+task createVersion(type: WriteProperties) {
+  outputFile = file("${project.buildDir}/VERSION")
+  properties( [ "version" : gitVersion ])
+}
+
 distributions {
   main {
     contents {
+      into('bin') { from createVersion.outputFile }
       into('bin') { from 'bin' }
       into('lib') { from 'lib' }
     }
   }
 }
 
-println("git-version: $gitVersion")
+distZip.dependsOn createVersion
 
 task copyHomepage(type: Copy) {
   from "web/index.html"

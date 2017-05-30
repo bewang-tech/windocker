@@ -34,8 +34,8 @@ function Download($uri, $outfile) {
   $Webclient.DownloadFile($uri, $outfile)
 }
 
-function Install-Windocker {
-  $zip = "$DownloadDir\windocker.zip"
+function Install-Windocker($version) {
+  $zip = "$DownloadDir\windocker-$version.zip"
 
   Download `
     -uri $WindockerURL `
@@ -125,11 +125,11 @@ function Setup-Developer-Env {
     -Wait -NoNewWindow
 }
 
-function Install {
+function Install($version) {
   Create-Env
   Install-CygwinX
   Install-DockerToolbox
-  Install-Windocker
+  Install-Windocker $version
   Create-DockerMachine
   Setup-Developer-Env
   Cygwin-X-Link
