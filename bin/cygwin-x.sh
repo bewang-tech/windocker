@@ -4,9 +4,9 @@ X0_LOCK=/tmp/.X0-lock
 DOCKER_MACHINE_IP=$1
 
 start_xwin() {
-  XWin :0 -multiwindow -clipboard -listen tcp &
+  /bin/XWin :0 -multiwindow -clipboard -listen tcp &
   if [ -n "$DOCKER_MACHINE_IP" ]; then
-    xhost +"$DOCKER_MACHINE_IP"
+    /bin/xhost +"$DOCKER_MACHINE_IP"
   fi
 }
 
