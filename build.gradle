@@ -10,6 +10,7 @@ ext {
   gitVersion = tagged == null ?  "" : tagged.replaceFirst(/^(?i)v/, "")
 
   dockerBuild = file("${project.buildDir}/docker")
+  dockerRepo = "rhapdocker:5000/bi/windocker"
 }
 
 group = "com.napster.bi"
@@ -46,5 +47,20 @@ task dockerBuildContext(type: Copy, dependsOn: distZip) {
 task buildImage(type: Exec, dependsOn: 'dockerBuildContext') {
   workingDir = dockerBuild
   environment("VERSION", gitVersion)
-  commandLine "sudo", "docker", "build", "-t", "rhapdocker:5000/bi/windocker", "--build-arg", "VERSION=$gitVersion", "."
+  commandLine "sudo", "docker", "build", "-t", "$dockerRepo:$gitVersion", "--build-arg", "VERSION=$gitVersion", "."
+}
+
+task pushImage(type: Exec, dependsOn: 'buildImage') {
+  workingDir = dockerBuild
+  commandLine "sudo", "docker", "push", "$dockerRepo:$gitVersion"
+}
+
+task tagImageAsLatest(type: Exec, dependsOn: 'pushImage') {
+  workingDir = dockerBuild
+  commandLine "sudo", "docker", "tag", "$dockerRepo:$gitVersion", dockerRepo
+}
+
+task pushImageAsLatest(type: Exec, dependsOn: 'tagImageAsLatest') {
+  workingDir = dockerBuild
+  commandLine "sudo", "docker", "push", dockerRepo
 }
