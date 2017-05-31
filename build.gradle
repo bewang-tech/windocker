@@ -18,39 +18,33 @@ description = "Scripts for setting up BI developer environment"
 
 task wrapper(type: Wrapper) { gradleVersion = "3.3" }
 
-task createVersion(type: WriteProperties) {
-  outputFile = file("${project.buildDir}/VERSION")
-  properties( [ "version" : gitVersion ])
-}
-
 distributions {
   main {
     contents {
-      into('bin') { from createVersion.outputFile }
       into('bin') { from 'bin' }
       into('lib') { from 'lib' }
     }
   }
 }
 
-distZip.dependsOn createVersion
-
-task copyHomepage(type: Copy) {
-  from "web/index.html"
-  filter { line -> 
-    line.replaceAll(~/\$\{windocker.version\}/, gitVersion)
-  }
-  into dockerBuild
-}
-
-task copyFiles(type: Copy, dependsOn: distZip) {
+task dockerBuildContext(type: Copy, dependsOn: distZip) {
   from "Dockerfile"
-  from "bin/windocker.ps1"
+  from("bin/windocker.ps1") {
+    filter { line ->
+      line.replaceAll(~/WindockerVersion\s*=\s*""/, "WindockerVersion=\"$gitVersion\"")
+    }
+  }
+  from("web/index.html") {
+    filter { line -> 
+      line.replaceAll(~/\$\{windocker.version\}/, gitVersion)
+    }
+  }
   from distZip.archivePath
   into dockerBuild
 }
 
-task buildImage(type: Exec, dependsOn: [ 'copyHomepage', 'copyFiles' ]) {
+task buildImage(type: Exec, dependsOn: 'dockerBuildContext') {
   workingDir = dockerBuild
-  commandLine "sudo", "docker", "build", "-t", "rhapdocker:5000/bi/windocker", "."
+  environment("VERSION", gitVersion)
+  commandLine "sudo", "docker", "build", "-t", "rhapdocker:5000/bi/windocker", "--build-arg", "VERSION=$gitVersion", "."
 }

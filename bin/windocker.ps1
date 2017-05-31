@@ -19,7 +19,10 @@ $DownloadDir = "$DevEnvDir\downloads"
 $CygwinDir = "$DevEnvDir\cygwin64"
 $CygwinPkgsDir = "$DownloadDir\cygwin"
 
-$WindockerURL="http://10.151.77.17/windocker.zip"
+$WindockerVersion=""
+$WindockerURL="http://10.151.77.17/windocker-$WindockerVersion.zip"
+
+$GitBash = "C:\Program Files\Git\bin\bash"
 
 $Shell = New-Object -ComObject("WScript.Shell")
 
@@ -34,14 +37,20 @@ function Download($uri, $outfile) {
   $Webclient.DownloadFile($uri, $outfile)
 }
 
-function Install-Windocker($version) {
-  $zip = "$DownloadDir\windocker-$version.zip"
+function Install-Windocker {
+  $zip = "$DownloadDir\windocker.zip"
 
   Download `
     -uri $WindockerURL `
     -outfile $zip
 
-  Unzip $zip $WindockerDir
+  Unzip $zip $DevEnvDir
+}
+
+function Create-Windocker-Symlink {
+  Start-Process "$GitBash" `
+    -ArgumentList "-c ln -sfT ""$DevEnvDir/windocker-$WindockerVersion"" ""$WindockerDir""" `
+    -Wait -NoNewWindow
 }
 
 function Create-Dir($path) {
@@ -78,7 +87,7 @@ function Install-DockerToolbox {
 
 function Create-Docker-Link($name, $app, $ico) {
   $Shortcut = $Shell.CreateShortCut("$env:UserProfile\Desktop\$name.lnk")
-  $Shortcut.TargetPath = "C:\Program Files\Git\bin\bash.exe"
+  $Shortcut.TargetPath = $GitBash
   $Shortcut.Arguments="-login -i ""$WindockerDir\bin\start.sh"" $app"
   $Shortcut.iconLocation = $ico
   $Shortcut.save()
@@ -114,22 +123,29 @@ function DevShell-Link {
 }
 
 function Create-DockerMachine {
-  Start-Process "C:\Program Files\Git\bin\bash.exe" `
-    -ArgumentList "--login ""$WindockerDir\lib\windocker"" setup_docker_machine" `
+  Start-Process "$GitBash" `
+    -ArgumentList "--login ""$WindockerDir\bin\windocker"" setup_docker_machine" `
     -Wait -NoNewWindow
 }
 
 function Setup-Developer-Env {
-  Start-Process "C:\Program Files\Git\bin\bash.exe" `
-    -ArgumentList "--login ""/c/Program Files/Docker Toolbox/start.sh"" ""$WindockerDir\lib\devenv"" setup_developer_env" `
+  Start-Process "$GitBash" `
+    -ArgumentList "--login ""/c/Program Files/Docker Toolbox/start.sh"" ""$WindockerDir\bin\devenv"" setup_developer_env" `
     -Wait -NoNewWindow
 }
 
-function Install($version) {
+function Install($cygwinPath, $skipDockerToolbox) {
   Create-Env
-  Install-CygwinX
-  Install-DockerToolbox
-  Install-Windocker $version
+  if ($PSBoundParameters.ContainsKey('cygwinPath')) {
+    $CygwinDir = $cygwinPath
+  } else {
+    Install-CygwinX
+  }
+  if (!$PSBoundParameters.ContainsKey('skipDockerToolbox')) {
+    Install-DockerToolbox
+  }
+  Install-Windocker
+  Create-Windocker-Symlink
   Create-DockerMachine
   Setup-Developer-Env
   Cygwin-X-Link

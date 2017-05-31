@@ -1,3 +1,5 @@
 FROM httpd
 
-COPY index.html windocker.ps1 windocker.zip /usr/local/apache2/htdocs/
+ARG VERSION
+
+COPY index.html windocker.ps1 windocker-${VERSION}.zip /usr/local/apache2/htdocs/
