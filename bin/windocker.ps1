@@ -48,8 +48,11 @@ function Install-Windocker {
 }
 
 function Create-Windocker-Symlink {
+  if (Test-Path "$WindockerDir") {
+    Remove-Item -Recurse -Force "$WindockerDir"
+  }
   Start-Process "$GitBash" `
-    -ArgumentList "-c ln -sfT ""$DevEnvDir/windocker-$WindockerVersion"" ""$WindockerDir""" `
+    -ArgumentList "-c 'ln -sfT ""$DevEnvDir/windocker-$WindockerVersion"" ""$WindockerDir""'" `
     -Wait -NoNewWindow
 }
 
@@ -70,7 +73,7 @@ function Install-CygwinX {
       -outfile "$setup"
   }
 
-  Start-Process "$setup" -ArgumentList "--site ""http://mirrors.xmission.com/cygwin"" --root ""$CygwinDir"" --packages xorg-server --no-admin --local-package-dir ""$CygwinPkgsDir"" --upgrade-also --quiet-mode" -Wait -NoNewWindow
+  Start-Process "$setup" -ArgumentList "--site ""http://mirrors.xmission.com/cygwin"" --root ""$CygwinDir"" --packages xorg-server,xhost --no-admin --local-package-dir ""$CygwinPkgsDir"" --upgrade-also --quiet-mode" -Wait -NoNewWindow
 }
 
 function Install-DockerToolbox {
