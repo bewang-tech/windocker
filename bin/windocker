@@ -11,11 +11,11 @@ RHAPREG=${RHAPREG:-rhapdocker:5000}
 
 vboxmanage() {
   if [ ! -z "$VBOX_MSI_INSTALL_PATH" ]; then
-    echo "${VBOX_MSI_INSTALL_PATH}VBoxManage.exe"
+    "${VBOX_MSI_INSTALL_PATH}VBoxManage.exe" "$@"
   elif [ ! -z "$VBOX_INSTALL_PATH" ]; then
-    echo "${VBOX_INSTALL_PATH}VBoxManage.exe"
+    "${VBOX_INSTALL_PATH}VBoxManage.exe" "$@"
   else
-    echo "/c/Program Files/Oracle/Virtualbox/VBoxManage.exe"
+    "/c/Program Files/Oracle/Virtualbox/VBoxManage.exe" "$@"
   fi
 }
 
@@ -24,26 +24,43 @@ get_value() {
   grep "$param" | cut -f 2 -d ':'
 }
 
-create_docker_machine() {
-  local vbox=$(vboxmanage)
-  local hostinfo=$("$vbox" list hostinfo)
+default_vm_config() {
+  local hostinfo=$(vboxmanage list hostinfo)
 
   local cpus=$(echo "$hostinfo" | get_value 'Processor core count')
   local mem=$(echo "$hostinfo" | get_value 'Memory size' | awk '{print $1}')
 
   local half_mem=$(( mem  / 2 ))
 
+  echo $cpus $half_mem
+}
+
+create_docker_machine() {
+  read cpus, half_mem <<< $(default_vm_config)
+
   "${DOCKER_MACHINE}" create \
     --driver virtualbox \
     --virtualbox-cpu-count $cpus \
     --virtualbox-memory $half_mem \
     --virtualbox-disk-size 50000 \
+    --virtualbox-host-dns-resolver \
     ${VM}
+}
+
+reset_vm_config() {
+  read cpus, half_mem <<< $(default_vm_config)
+ 
+  vboxmanage modifyvm ${VM} \
+    --memory $half_mem \
+    --cpus $cpus \
+    --vram 128 \
+    --natdnshostresolver1
 }
 
 add_rhapdocker_host() {
   # this function is added into the modified version of start.sh
-  "$DOCKER_MACHINE" ssh ${VM} "sudo sed -i '/rhapdocker/d' /etc/hosts; sudo /bin/sh -c 'echo $RHAPDOCKER rhapdocker >> /etc/hosts'"
+  "$DOCKER_MACHINE" ssh ${VM} \
+    "sudo sed -i '/rhapdocker/d' /etc/hosts; sudo /bin/sh -c 'echo $RHAPDOCKER rhapdocker >> /etc/hosts'"
 }
 
 config_rhapdocker_cert() {
