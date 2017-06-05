@@ -8,7 +8,18 @@ export USER=$(echo $USERNAME | tr [A-Z] [a-z])
 
 export DEV_ENV=${DEV_ENV:-$HOME/dev-env}
 
-export MY_DOCKER=${MY_DOCKER:-$HOME/my-docker}
+# MSYS used by Docker Toolbox has the following issues:
+# - permission issues: 
+#   - you cannot change the permissions of ~/.ssh so that SSH does not work.
+#   - the file permissions are messy if you map a volume of Windows Filesystem to your container.
+# - symlink: MSYS actually just makes a hard link for symlink.
+# - Intellij IDEA user perferences: Windows Filesystem doesn't allow some special
+#   characters in the file name. Intellij cannot save user perfences and will report warnings.
+#
+# To avoid the above issues, we use "/my-docker" in the VM as the volume mapping to 
+# the container's user home directory for all development containers. 
+# Note: the VM is boot2loader, which is debian based.
+export MY_DOCKER=${MY_DOCKER:-/my-docker}
 
 export RHAPREG=rhapdocker:5000
 
