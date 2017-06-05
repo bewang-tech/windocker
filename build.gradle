@@ -10,8 +10,7 @@ ext {
   gitVersion = tagged == null ?  "" : tagged.replaceFirst(/^(?i)v/, "")
 
   dockerBuild = file("${project.buildDir}/docker")
-  dockerRepo = "rhapdocker:5000/bi/windocker"
-  dockerPushRepo = "rhapdocker:15001/bi/windocker"
+  dockerRepo = "rhapdocker:15001/bi/windocker"
 }
 
 group = "com.napster.bi"
@@ -63,5 +62,5 @@ task tagImageAsLatest(type: Exec, dependsOn: 'pushImage') {
 
 task pushImageAsLatest(type: Exec, dependsOn: 'tagImageAsLatest') {
   workingDir = dockerBuild
-  commandLine "sudo", "docker", "push", dockerPushRepo
+  commandLine "sudo", "docker", "push", dockerRepo
 }
