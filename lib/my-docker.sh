@@ -21,6 +21,10 @@ export DEV_ENV=${DEV_ENV:-$HOME/dev-env}
 # Note: the VM is boot2loader, which is debian based.
 export MY_DOCKER=${MY_DOCKER:-/my-docker}
 
+# Default UID and GID for the developer in a container
+export UID=${UID:-1000}
+export GID=${GID:-1000}
+
 export RHAPREG=rhapdocker:5000
 
 find_cygwin_home() {

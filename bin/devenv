@@ -28,7 +28,8 @@ build_user_image() {
   cat <<EOF > dockerfile
 FROM $image
 
-RUN useradd $USER \
+RUN groupadd --gid $GID \
+    && useradd --uid $UID --gid $GID $USER \
     && echo "$USER ALL=(ALL) NOPASSWORD: ALL" >> /etc/sudoers
 
 USER $USER
@@ -39,13 +40,20 @@ EOF
   popd
 }
 
+mkdir_on_vm() {
+  local dir=$1
+
+  docker-machine ssh $VM \
+    "sudo mkdir -p $dir; sudo chown -R $UID:$GID $dir"
+}
+
 build_user_uc4() {
-  mkdir -p $MY_DOCKER/uc4
+  mkdir_on_vm $MY_DOCKER/uc4
   build_user_image $RHAPREG/bi/uc4 $USER/uc4
 }
 
 build_user_intellij() {
-  mkdir -p $MY_DOCKER/intellij
+  mkdir_on_vm $MY_DOCKER/intellij
   build_user_image $RHAPREG/bi/intellij $USER/intellij
 }
 
