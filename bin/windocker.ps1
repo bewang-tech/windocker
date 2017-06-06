@@ -29,7 +29,8 @@ $Shell = New-Object -ComObject("WScript.Shell")
 
 function Unzip($zipfile, $outpath) {
   Start-Process "$GitDir/usr/bin/unzip.exe" `
-    -ArgumentList "-u $zipfile -d $outpath"
+    -ArgumentList "-u $zipfile -d $outpath" `
+    -Wait -NoNewWindow
 }
 
 function Download($uri, $outfile) {
