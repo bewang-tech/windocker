@@ -36,7 +36,7 @@ default_vm_config() {
 }
 
 create_docker_machine() {
-  read cpus, half_mem <<< $(default_vm_config)
+  read cpus half_mem <<< $(default_vm_config)
 
   "${DOCKER_MACHINE}" create \
     --driver virtualbox \
