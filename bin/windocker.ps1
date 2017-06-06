@@ -157,6 +157,4 @@ function Install($cygwinPath, $skipDockerToolbox) {
   DevShell-Link
 }
 
-$cmd=$args[0]
-
-Invoke-Expression "$cmd"
+Invoke-Expression "$args"
