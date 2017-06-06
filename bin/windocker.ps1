@@ -22,14 +22,14 @@ $CygwinPkgsDir = "$DownloadDir\cygwin"
 $WindockerVersion=""
 $WindockerURL="http://10.151.77.17:10080/windocker-$WindockerVersion.zip"
 
-$GitBash = "C:\Program Files\Git\bin\bash"
+$GitDir = "C:\Program Files\Git"
+$GitBash = "$GitDir\bin\bash"
 
 $Shell = New-Object -ComObject("WScript.Shell")
 
-Add-Type -AssemblyName System.IO.Compression.FileSystem
-
 function Unzip($zipfile, $outpath) {
-  [System.IO.Compression.ZipFile]::ExtractToDirectory($zipfile, $outpath)
+  Start-Process "$GitDir/usr/bin/unzip.exe" `
+    -ArgumentList "-u $zipfile -d $outpath"
 }
 
 function Download($uri, $outfile) {
