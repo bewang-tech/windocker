@@ -65,6 +65,10 @@ init_user_intellij() {
 } 
 
 setup_developer_env() {
+  echo "Starting docker machine $VM if it is not running ..."
+  "$DOCKER_MACHINE" start "$VM"
+  eval $("$DOCKER_MACHINE" env "$VM")
+
   echo "Pulling bi/uc4 ..."
   pull_bi_uc4
 
