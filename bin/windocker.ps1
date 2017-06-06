@@ -13,6 +13,7 @@
 	 |-- uc4 (Home directory for UC4)
 	 \-- intellij (Home directory for user's intellij)
 #>
+$DockerToolboxDir="c:\Program Files\Docker Toolbox"
 $DevEnvDir = "$env:UserProfile\dev-env"
 $WindockerDir= "$DevEnvDir\windocker"
 $DownloadDir = "$DevEnvDir\downloads"
@@ -89,11 +90,16 @@ function Install-DockerToolbox {
   Start-Process "$toolbox" -ArgumentList "/SILENT" -Wait -NoNewWindow
 }
 
+function Unix-Path($winPath) {
+  (& "$GitDir\usr\bin\cygpath.exe" -u $winPath)
+}
+
 function Create-DockerLink($name, $app, $ico) {
+  [string]$path = (Unix-Path $app)
   $Shortcut = $Shell.CreateShortCut("$env:UserProfile\Desktop\$name.lnk")
   $Shortcut.TargetPath = $GitBash
-  $Shortcut.Arguments="-login -i ""$WindockerDir\bin\start.sh"" $app"
-  $Shortcut.WorkingDirectory="C:\Program Files\Docker Toolbox"
+  $Shortcut.Arguments = "--login -i ""$DockerToolboxDir\start.sh"" $path"
+  $Shortcut.WorkingDirectory = $DockerToolboxDir
   $Shortcut.iconLocation = $ico
   $Shortcut.save()
 }
@@ -134,8 +140,9 @@ function Create-DockerMachine {
 }
 
 function Setup-DeveloperEnv {
+  [string]$path=(Unix-Path $WindockerDir\bin\setup-devenv)
   Start-Process "$GitBash" `
-    -ArgumentList "--login ""c:\Program Files\Docker Toolbox\start.sh"" ""~/dev-env/windocker/bin/setup-devenv"" setup_developer_env" `
+    -ArgumentList "--login ""c:\Program Files\Docker Toolbox\start.sh"" ""$path"" setup_developer_env" `
     -WorkingDirectory "c:\Program Files\Docker Toolbox" `
     -Wait -NoNewWindow
 }

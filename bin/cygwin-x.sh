@@ -5,6 +5,9 @@ DOCKER_MACHINE_IP=$1
 
 start_xwin() {
   /bin/XWin :0 -multiwindow -clipboard -listen tcp &
+}
+
+grant_access() {
   if [ -n "$DOCKER_MACHINE_IP" ]; then
     /bin/xhost +"$DOCKER_MACHINE_IP"
   fi
@@ -21,3 +24,5 @@ else
   # The lock file doesnot exist, start XWin
   start_xwin
 fi
+
+grant_access
