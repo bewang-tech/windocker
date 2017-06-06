@@ -20,7 +20,7 @@ $CygwinDir = "$DevEnvDir\cygwin64"
 $CygwinPkgsDir = "$DownloadDir\cygwin"
 
 $WindockerVersion=""
-$WindockerURL="http://10.151.77.17/windocker-$WindockerVersion.zip"
+$WindockerURL="http://10.151.77.17:10080/windocker-$WindockerVersion.zip"
 
 $GitBash = "C:\Program Files\Git\bin\bash"
 
@@ -38,7 +38,7 @@ function Download($uri, $outfile) {
 }
 
 function Install-Windocker {
-  $zip = "$DownloadDir\windocker.zip"
+  $zip = "$DownloadDir\windocker-$WindockerVersion.zip"
 
   Download `
     -uri $WindockerURL `
