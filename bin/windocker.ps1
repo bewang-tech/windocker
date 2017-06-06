@@ -47,7 +47,7 @@ function Install-Windocker {
   Unzip $zip $DevEnvDir
 }
 
-function Create-Windocker-Symlink {
+function Create-WindockerSymlink {
   if (Test-Path "$WindockerDir") {
     Remove-Item -Recurse -Force "$WindockerDir"
   }
@@ -88,7 +88,7 @@ function Install-DockerToolbox {
   Start-Process "$toolbox" -ArgumentList "/SILENT" -Wait -NoNewWindow
 }
 
-function Create-Docker-Link($name, $app, $ico) {
+function Create-DockerLink($name, $app, $ico) {
   $Shortcut = $Shell.CreateShortCut("$env:UserProfile\Desktop\$name.lnk")
   $Shortcut.TargetPath = $GitBash
   $Shortcut.Arguments="-login -i ""$WindockerDir\bin\start.sh"" $app"
@@ -105,21 +105,21 @@ function Cygwin-X-Link {
 }
 
 function UC4-Link {
-  Create-Docker-Link `
+  Create-DockerLink `
     -name UC4 `
     -app "$WindockerDir\bin\uc4" `
     -ico "$WindockerDir\lib\uc4.ico"
 }
 
 function Idea-Link {
-  Create-Docker-Link `
+  Create-DockerLink `
     -name Intellij `
     -app "$WindockerDir\bin\idea" `
     -ico "$WindockerDir\lib\idea.ico"
 }
 
 function DevShell-Link {
-  Create-Docker-Link `
+  Create-DockerLink `
     -name "Dev Shell" `
     -app "$WindockerDir\bin\devsh" `
     -ico "$WindockerDir\lib\idea.ico"
@@ -131,9 +131,9 @@ function Create-DockerMachine {
     -Wait -NoNewWindow
 }
 
-function Setup-Developer-Env {
+function Setup-DeveloperEnv {
   Start-Process "$GitBash" `
-    -ArgumentList "--login ""/c/Program Files/Docker Toolbox/start.sh"" ""$WindockerDir\bin\devenv"" setup_developer_env" `
+    -ArgumentList "--login ""/c/Program Files/Docker Toolbox/start.sh"" ""$WindockerDir\bin\setup-devenv"" setup_developer_env" `
     -Wait -NoNewWindow
 }
 
@@ -148,9 +148,9 @@ function Install($cygwinPath, $skipDockerToolbox) {
     Install-DockerToolbox
   }
   Install-Windocker
-  Create-Windocker-Symlink
+  Create-WindockerSymlink
   Create-DockerMachine
-  Setup-Developer-Env
+  Setup-DeveloperEnv
   Cygwin-X-Link
   UC4-Link
   Idea-Link

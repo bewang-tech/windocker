@@ -7,4 +7,4 @@ source $BASEDIR/bin/intellij.sh
 
 start_cygwin_x
 
-run_intellij -it --name idea /bin/bash --login /usr/local/bin/idea
+run_intellij -it --name idea -- /bin/bash --login /usr/local/bin/idea

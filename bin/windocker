@@ -44,17 +44,17 @@ create_docker_machine() {
     --virtualbox-memory $half_mem \
     --virtualbox-disk-size 50000 \
     --virtualbox-host-dns-resolver \
-    ${VM}
+    "$VM"
 }
 
 reset_vm_config() {
-  read cpus, half_mem <<< $(default_vm_config)
+  read cpus half_mem <<< $(default_vm_config)
  
-  vboxmanage modifyvm ${VM} \
+  vboxmanage modifyvm "$VM" \
     --memory $half_mem \
     --cpus $cpus \
     --vram 128 \
-    --natdnshostresolver1
+    --natdnshostresolver1 on
 }
 
 add_rhapdocker_host() {
@@ -64,17 +64,20 @@ add_rhapdocker_host() {
 }
 
 config_rhapdocker_cert() {
+  echo "Starting docker machine if it is not running ..."
+  "$DOCKER_MACHINE" start "$VM"
+
   echo "Adding docker machine environment ..."
-  eval "$($DOCKER_MACHINE env ${VM})"
+  eval "$($DOCKER_MACHINE env "${VM}")"
 
   echo "Copying rhapdocker.crt to ${VM} ..."
   pushd $BASEDIR
-  "${DOCKER_MACHINE}" scp lib/rhapdocker.crt ${VM}:/tmp
+  "${DOCKER_MACHINE}" scp lib/rhapdocker.crt "${VM}:/tmp"
   popd
 
   CERT_DIR=/etc/docker/certs.d/$RHAPREG
   echo "Putting rhapdocker.crt to $CERT_DIR ..."
-  "${DOCKER_MACHINE}" ssh ${VM} "if [ -e $CERT_DIR ]; then sudo rm -rf $CERT_DIR; fi; sudo mkdir -p $CERT_DIR; sudo mv /tmp/rhapdocker.crt $CERT_DIR"
+  "${DOCKER_MACHINE}" ssh "$VM" "if [ -e $CERT_DIR ]; then sudo rm -rf $CERT_DIR; fi; sudo mkdir -p $CERT_DIR; sudo mv /tmp/rhapdocker.crt $CERT_DIR"
 }
 
 setup_docker_machine() {

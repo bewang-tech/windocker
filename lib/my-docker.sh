@@ -8,22 +8,27 @@ export USER=$(echo $USERNAME | tr [A-Z] [a-z])
 
 export DEV_ENV=${DEV_ENV:-$HOME/dev-env}
 
+export VM=${VM:-default}
+
 # MSYS used by Docker Toolbox has the following issues:
 # - permission issues: 
 #   - you cannot change the permissions of ~/.ssh so that SSH does not work.
-#   - the file permissions are messy if you map a volume of Windows Filesystem to your container.
+#   - the file permissions are messy if you map a directory of Windows 
+#     Filesystem to your container.
 # - symlink: MSYS actually just makes a hard link for symlink.
-# - Intellij IDEA user perferences: Windows Filesystem doesn't allow some special
-#   characters in the file name. Intellij cannot save user perfences and will report warnings.
+# - Intellij IDEA user perferences: Windows Filesystem doesn't allow 
+#   some special characters in the file name. Intellij cannot save
+#   user perfences and will report warnings.
 #
-# To avoid the above issues, we use "/my-docker" in the VM as the volume mapping to 
+# To avoid the above issues, we use the user docker:staff "/home/docker"
+# in the VM as the volume mapping to 
 # the container's user home directory for all development containers. 
 # Note: the VM is boot2loader, which is debian based.
-export MY_DOCKER=${MY_DOCKER:-/my-docker}
+export MY_DOCKER=${MY_DOCKER:-/home/docker}
 
-# Default UID and GID for the developer in a container
-export UID=${UID:-1000}
-export GID=${GID:-1000}
+export DOCKER_MACHINE="/c/Program Files/Docker Toolbox/docker-machine.exe"
+export DOCKER_UID=$("$DOCKER_MACHINE" ssh "$VM" "id -u docker")
+export DOCKER_GID=$("$DOCKER_MACHINE" ssh "$VM" "id -g docker")
 
 export RHAPREG=rhapdocker:5000
 
