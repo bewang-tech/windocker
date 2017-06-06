@@ -28,7 +28,7 @@ export MY_DOCKER=${MY_DOCKER:-/home/docker}
 
 export DOCKER_MACHINE="/c/Program Files/Docker Toolbox/docker-machine.exe"
 export DOCKER_UID=$("$DOCKER_MACHINE" ssh "$VM" "id -u docker")
-export DOCKER_GID=$("$DOCKER_MACHINE" ssh "$VM" "id -g docker")
+export DOCKER_GID=$DOCKER_UID
 
 export RHAPREG=rhapdocker:5000
 
