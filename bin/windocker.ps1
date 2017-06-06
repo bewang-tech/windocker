@@ -93,6 +93,7 @@ function Create-DockerLink($name, $app, $ico) {
   $Shortcut = $Shell.CreateShortCut("$env:UserProfile\Desktop\$name.lnk")
   $Shortcut.TargetPath = $GitBash
   $Shortcut.Arguments="-login -i ""$WindockerDir\bin\start.sh"" $app"
+  $Shortcut.WorkingDirectory="C:\Program Files\Docker Toolbox"
   $Shortcut.iconLocation = $ico
   $Shortcut.save()
 }
@@ -134,7 +135,8 @@ function Create-DockerMachine {
 
 function Setup-DeveloperEnv {
   Start-Process "$GitBash" `
-    -ArgumentList "--login ""/c/Program Files/Docker Toolbox/start.sh"" ""$WindockerDir\bin\setup-devenv"" setup_developer_env" `
+    -ArgumentList "--login ""c:\Program Files\Docker Toolbox\start.sh"" ""~/dev-env/windocker/bin/setup-devenv"" setup_developer_env" `
+    -WorkingDirectory "c:\Program Files\Docker Toolbox" `
     -Wait -NoNewWindow
 }
 

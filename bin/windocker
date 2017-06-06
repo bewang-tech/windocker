@@ -84,6 +84,9 @@ setup_docker_machine() {
   echo "Creating docker machine $VM ..."
   create_docker_machine 
 
+  echo "Adding rhapdocker host ..."
+  add_rhapdocker_host
+
   echo "Configuring rhapdocker certificate ..."
   config_rhapdocker_cert
 }
